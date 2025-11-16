@@ -8,13 +8,7 @@ import { EventCard } from "./EventCard";
 import { useEffect, useState } from "react";
 import { EventShimmer } from "./EventShimmer";
 
-export function Events() {
-  const [events, setEvents] = useState([] as Event[]);
-
-  useEffect(() => {
-    fetchEvents().then((data) => setEvents(data));
-  }, []);
-
+function sortEvents(events: Event[]): [Event[], [string, Event[]][], number] {
   const pastEvents = [];
   const plannedEvents = [];
   const pastCutoff = new Date().getTime() - 1000 * 60 * 60 * 24 * 7 * 4; // 4 weeks ago
@@ -26,6 +20,38 @@ export function Events() {
       plannedEvents.push(event);
     }
   }
+  // show most recent past events first
+  pastEvents.reverse();
+  // group past events by semester
+  const groupedPastEvents = pastEvents.reduce(
+    (acc: Record<string, Event[]>, event) => {
+      let semester = "Other";
+      if (event.date instanceof Date) {
+        const year = event.date.getFullYear();
+        const month = event.date.getMonth();
+        if (month < 6) {
+          semester = `${year} Spring`;
+        } else {
+          semester = `${year} Fall`;
+        }
+      }
+      acc[semester] = [...(acc[semester] || []), event];
+      return acc;
+    },
+    {}
+  );
+  return [plannedEvents, Object.entries(groupedPastEvents), pastEvents.length];
+}
+
+export function Events() {
+  const [events, setEvents] = useState([] as Event[]);
+
+  useEffect(() => {
+    fetchEvents().then((data) => setEvents(data));
+  }, []);
+
+  const [plannedEvents, groupedPastEvents, pastEventsCount] =
+    sortEvents(events);
 
   return (
     <section className="px-4 py-24 container max-w-5xl md:bg-onPrimary/50 md:backdrop-blur-sm">
@@ -84,14 +110,22 @@ export function Events() {
             </div>
           )}
 
-          {pastEvents.length > 0 && (
+          {pastEventsCount > 0 && (
             <details className="mt-6">
               <summary className="cursor-pointer font-bold text-lg text-center py-2 hover:text-primary transition">
-                Past Events ({pastEvents.length})
+                Past Events ({pastEventsCount})
               </summary>
-              <div className="mt-3 grid grid-cols-1 md:grid-cols-3 gap-6 bg-onPrimary/20">
-                {pastEvents.map((event) => (
-                  <EventCard key={event.title} event={event} />
+              <div className="flex flex-col gap-4">
+                {groupedPastEvents.map(([semester, events]) => (
+                  <div key={semester}>
+                    <h4 className="font-bold text-lg">{semester}</h4>
+                    <hr className="border-t border-primary/20 mb-4" />
+                    <div className="mt-2 grid grid-cols-1 md:grid-cols-3 gap-6 bg-onPrimary/20">
+                      {events.map((event) => (
+                        <EventCard key={event.title} event={event} />
+                      ))}
+                    </div>
+                  </div>
                 ))}
               </div>
             </details>
