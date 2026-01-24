@@ -1,4 +1,4 @@
-import { Event, dateConfig, timeConfig } from "@/content/events";
+import { Event, formatDate } from "@/content/events";
 
 export function EventCard({ event }: { event: Event; }) {
   const hasLink = Boolean(event.link);
@@ -20,18 +20,11 @@ export function EventCard({ event }: { event: Event; }) {
           Slides link
         </a>
       )}
-      <p className="mt-2 text-xs italic text-primary/80">
-        {typeof event.date === "string"
-          ? event.date
-          : event.date.toLocaleDateString("en-US", {
-            ...dateConfig,
-            // don't display time if it's midnight (default)
-            ...(event.date instanceof Date &&
-              event.date.getHours() !== 0
-              ? timeConfig
-              : {}),
-          } as Intl.DateTimeFormatOptions)}
-      </p>
+      {event.date && (
+        <p className="mt-2 text-xs italic text-primary/80">
+          {formatDate(event.date)}
+        </p>
+      )}
     </div>
   );
 }

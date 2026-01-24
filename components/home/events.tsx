@@ -2,46 +2,11 @@
 import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
-import { calendarLink, fetchEvents, Event } from "@/content/events";
+import { calendarLink, fetchEvents, Event, sortEvents } from "@/content/events";
 import { FaCalendarPlus } from "react-icons/fa6";
 import { EventCard } from "./EventCard";
 import { useEffect, useState } from "react";
 import { EventShimmer } from "./EventShimmer";
-
-function sortEvents(events: Event[]): [Event[], [string, Event[]][], number] {
-  const pastEvents = [];
-  const plannedEvents = [];
-  const pastCutoff = new Date().getTime() - 1000 * 60 * 60 * 24 * 7 * 4; // 4 weeks ago
-
-  for (const event of events) {
-    if (event.date instanceof Date && event.date.getTime() < pastCutoff) {
-      pastEvents.push(event);
-    } else {
-      plannedEvents.push(event);
-    }
-  }
-  // show most recent past events first
-  pastEvents.reverse();
-  // group past events by semester
-  const groupedPastEvents = pastEvents.reduce(
-    (acc: Record<string, Event[]>, event) => {
-      let semester = "Other";
-      if (event.date instanceof Date) {
-        const year = event.date.getFullYear();
-        const month = event.date.getMonth();
-        if (month < 6) {
-          semester = `${year} Spring`;
-        } else {
-          semester = `${year} Fall`;
-        }
-      }
-      acc[semester] = [...(acc[semester] || []), event];
-      return acc;
-    },
-    {}
-  );
-  return [plannedEvents, Object.entries(groupedPastEvents), pastEvents.length];
-}
 
 export function Events() {
   const [events, setEvents] = useState([] as Event[]);
@@ -50,8 +15,7 @@ export function Events() {
     fetchEvents().then((data) => setEvents(data));
   }, []);
 
-  const [plannedEvents, groupedPastEvents, pastEventsCount] =
-    sortEvents(events);
+  const [plannedEvents, groupedPastEvents, pastEventsCount] = sortEvents(events);
 
   return (
     <section className="px-4 py-24 container max-w-5xl md:bg-onPrimary/50 md:backdrop-blur-sm">
@@ -96,16 +60,19 @@ export function Events() {
 
       {events.length === 0 ? (
         <div className="mt-3 grid grid-cols-1 md:grid-cols-3 gap-6 bg-onPrimary/20">
-          {[...Array(6)].map((_, i) => (
-            <EventShimmer key={i} />
-          ))}
+          <EventShimmer />
+          <EventShimmer />
+          <EventShimmer />
+          <EventShimmer />
+          <EventShimmer />
+          <EventShimmer />
         </div>
       ) : (
         <>
           {plannedEvents.length > 0 && (
             <div className="mt-3 grid grid-cols-1 md:grid-cols-3 gap-6 bg-onPrimary/20">
               {plannedEvents.map((event) => (
-                <EventCard key={event.title} event={event} />
+                <EventCard key={event.key} event={event} />
               ))}
             </div>
           )}
@@ -122,7 +89,7 @@ export function Events() {
                     <hr className="border-t border-primary/20 mb-4" />
                     <div className="mt-2 grid grid-cols-1 md:grid-cols-3 gap-6 bg-onPrimary/20">
                       {events.map((event) => (
-                        <EventCard key={event.title} event={event} />
+                        <EventCard key={event.key} event={event} />
                       ))}
                     </div>
                   </div>
