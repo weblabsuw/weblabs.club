@@ -76,9 +76,9 @@ export function sortEvents(events: Event[]): [Event[], [string, Event[]][], numb
   const groupedPastEvents = pastEvents.reduce(
     (acc: Record<string, Event[]>, event) => {
       let semester = "Other";
-      if (event.date instanceof Date) {
-        const year = event.date.getFullYear();
-        const month = event.date.getMonth();
+      if (event.date instanceof Object) {
+        const year = event.date.start.date().getFullYear();
+        const month = event.date.start.date().getMonth();
         if (month < 6) {
           semester = `${year} Spring`;
         } else {

@@ -78,7 +78,7 @@ export function Events() {
           )}
 
           {pastEventsCount > 0 && (
-            <details className="mt-6">
+            <details className="mt-6 scroll-mt-16" id="past-events" onToggle={() => document.getElementById("past-events")?.scrollIntoView({block: "start"})}>
               <summary className="cursor-pointer font-bold text-lg text-center py-2 hover:text-primary transition">
                 Past Events ({pastEventsCount})
               </summary>
