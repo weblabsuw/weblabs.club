@@ -22,11 +22,11 @@ export function EventCard({ event }: { event: Event; }) {
         </a>
       )}
       {event.date && (
-        <p className="mt-2 text-xs italic text-primary/80">
+        <p className="mt-2 text-xs italic text-primary/80 text-balance">
           {event.location && (
-            <span className="">
+            <>
               {event.location} @{" "}
-            </span>
+            </>
           )}
           {formatDate(event.date)}
         </p>
