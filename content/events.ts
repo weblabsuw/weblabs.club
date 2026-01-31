@@ -12,6 +12,7 @@ export interface Event {
   date: chrono.ParsedResult | string | null;
   status: "past" | "planned";
   link?: string;
+  location?: string;
   key: string;
 }
 
@@ -27,6 +28,15 @@ const timeConfig: Intl.DateTimeFormatOptions = {
   hour: "numeric",
   minute: "2-digit",
 };
+
+const ONE_WEEK_MS = 1000 * 60 * 60 * 24 * 7;
+
+export const formatStatus = (event: Event): "past" | "planned" | "soon!" => {
+  if (event.status === "planned" && event.date instanceof Object && (new Date().getTime() + ONE_WEEK_MS >= event.date.start.date().getTime())) {
+    return "soon!";
+  }
+  return event.status;
+}
 
 export const formatDate = (date: string | chrono.ParsedResult): string => {
   if (typeof date === "string") return date;
@@ -134,7 +144,8 @@ export async function fetchEvents(): Promise<Event[]> {
       const eventTitle = values[0];
       const description = values[1] || "";
       const dateStr = values[2];
-      const link = values[3] || "";
+      const link = values[3] || undefined;
+      const location = values[4] || undefined;
 
       let status: "past" | "planned" = "planned";
 
@@ -151,7 +162,8 @@ export async function fetchEvents(): Promise<Event[]> {
         description,
         date,
         status,
-        link: link || undefined,
+        location,
+        link,
         key
       };
     })
