@@ -21,7 +21,7 @@ const unbounded = localFont({
 
 export const metadata: Metadata = {
   title: "WebLabs @ UW",
-  description: "",
+  description: "We are a student org @ UW-Madison dedicated to building websites together. We build real projects together and learn from each other along the way.",
 };
 
 export default function RootLayout({
@@ -31,6 +31,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <script defer data-domain="weblabs.club" src="https://net.tsuni.dev/js/script.js"></script>
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${unbounded.variable} antialiased bg-surface text-onSurface relative`}
       >
