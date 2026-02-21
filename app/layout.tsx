@@ -1,5 +1,5 @@
 import "./globals.css";
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 import { Toaster } from "@/components/ui/sonner";
 
@@ -21,7 +21,14 @@ const unbounded = localFont({
 
 export const metadata: Metadata = {
   title: "WebLabs @ UW",
-  description: "We are a student org @ UW-Madison dedicated to building websites together. We build real projects together and learn from each other along the way.",
+  description: "We're a student org at UW-Madison dedicated to building websites together. We build real projects together and learn from each other along the way!",
+  openGraph: {
+    images: ["https://weblabs.club/images/header.png"],
+  }
+};
+
+export const viewport: Viewport = {
+  themeColor: "#A78875"
 };
 
 export default function RootLayout({
