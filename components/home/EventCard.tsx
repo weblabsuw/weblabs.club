@@ -9,7 +9,8 @@ export function EventCard({ event }: { event: Event; }) {
       <h3 className="text-base leading-tight font-bold">{event.title}</h3>
       <div className="mt-1.5 flex gap-2 items-center text-xs font-medium">
         <span className={`px-1.5 border-2 ${
-            status === "past" || status === "soon!" ? "bg-primary text-onPrimary border-primary" : 
+            status === "past" ? "bg-primary/70 text-onPrimary border-primary" : 
+            status === "soon!" ? "bg-primary text-onPrimary border-primary" :
             "text-primary border-primary"}`}>
           {status}
         </span>
