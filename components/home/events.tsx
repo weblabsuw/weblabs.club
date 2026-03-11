@@ -18,7 +18,7 @@ export function Events() {
   const [plannedEvents, groupedPastEvents, pastEventsCount] = sortEvents(events);
 
   return (
-    <section className="px-4 py-24 container max-w-5xl md:bg-onPrimary/50 md:backdrop-blur-sm">
+    <section className="px-4 py-24 container max-w-5xl md:bg-onPrimary/50">
       <div className="px-8 md:px-12 py-8 text-onPrimary bg-primary rounded-3xl">
         <h2 className="text-3xl font-extrabold">What we do</h2>
 

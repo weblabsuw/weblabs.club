@@ -29,14 +29,38 @@ const timeConfig: Intl.DateTimeFormatOptions = {
   minute: "2-digit",
 };
 
+export type EventDisplayStatus = Event["status"] | "soon!" | "now!";
+
+const ONE_HOUR_MS = 1000 * 60 * 60;
 const ONE_WEEK_MS = 1000 * 60 * 60 * 24 * 7;
 
-export const formatStatus = (event: Event): "past" | "planned" | "soon!" => {
-  if (event.status === "planned" && event.date instanceof Object && (new Date().getTime() + ONE_WEEK_MS >= event.date.start.date().getTime())) {
+const isParsedDate = (
+  date: Event["date"]
+): date is chrono.ParsedResult => {
+  return Boolean(date && typeof date === "object" && "start" in date);
+};
+
+export const formatStatus = (event: Event): EventDisplayStatus => {
+  if (isParsedDate(event.date)) {
+    const now = new Date().getTime();
+    const startTime = event.date.start.date().getTime();
+    const endTime = event.date.end?.date().getTime() ?? startTime;
+
+    if (now >= startTime - ONE_HOUR_MS && now <= endTime + ONE_HOUR_MS) {
+      return "now!";
+    }
+  }
+
+  if (
+    event.status === "planned" &&
+    isParsedDate(event.date) &&
+    new Date().getTime() + ONE_WEEK_MS >= event.date.start.date().getTime()
+  ) {
     return "soon!";
   }
+
   return event.status;
-}
+};
 
 export const formatDate = (date: string | chrono.ParsedResult): string => {
   if (typeof date === "string") return date;
@@ -74,7 +98,7 @@ export function sortEvents(events: Event[]): [Event[], [string, Event[]][], numb
   const pastCutoff = new Date().getTime() - 1000 * 60 * 60 * 24 * 7 * 4; // 4 weeks ago
 
   for (const event of events) {
-    if (event.date instanceof Object && event.date.start.date().getTime() < pastCutoff) {
+    if (isParsedDate(event.date) && event.date.start.date().getTime() < pastCutoff) {
       pastEvents.push(event);
     } else {
       plannedEvents.push(event);
@@ -86,7 +110,7 @@ export function sortEvents(events: Event[]): [Event[], [string, Event[]][], numb
   const groupedPastEvents = pastEvents.reduce(
     (acc: Record<string, Event[]>, event) => {
       let semester = "Other";
-      if (event.date instanceof Object) {
+      if (isParsedDate(event.date)) {
         const year = event.date.start.date().getFullYear();
         const month = event.date.start.date().getMonth();
         if (month < 6) {
@@ -151,7 +175,7 @@ export async function fetchEvents(): Promise<Event[]> {
 
       const date = dateStr ? chrono.strict.parse(dateStr)[0] || dateStr : null;
       // Parse date and determine status
-      if (date instanceof Object) {
+      if (isParsedDate(date)) {
         status = date.start.date() < new Date() ? "past" : "planned";
       }
 

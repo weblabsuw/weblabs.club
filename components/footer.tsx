@@ -3,7 +3,7 @@ import { config } from "@/content/config";
 
 export function Footer() {
   return (
-    <footer className="px-4 pt-4 pb-8 container max-w-5xl flex flex-col sm:flex-row justify-between gap-4 items-center md:items-end border-t-2 border-onSurface/10 bg-onPrimary/50 backdrop-blur-sm">
+    <footer className="px-4 pt-4 pb-8 container max-w-5xl flex flex-col sm:flex-row justify-between gap-4 items-center md:items-end border-t-2 border-onSurface/10 bg-onPrimary/50">
       <div className="flex gap-4 text-sm sm:text-xs">
         <Link
           href="/about"
